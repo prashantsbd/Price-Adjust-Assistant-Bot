@@ -1,0 +1,37 @@
+name : License Office Pricing Manager
+
+on:
+  schedule:
+    - cron: '30 16 */5 * *'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  AnalyzingMarket:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.11']
+        
+    env:
+      ID : ${{ secrets.LICENSE_ID }}
+      PW : ${{ secrets.LICENSE_PW }}
+      li_url : ${{ secrets.LICENSE_URL }}
+      Api_key : ${{ secrets.API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get Python OpenSource Action
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Dependencies Installation
+        run: |
+          python -m pip install --upgrade pip
+          pip install selenium
+          pip install python-dotenv
+          pip install requests
+      - name: Run Data Fed
+        run: python ./fees_api.py
